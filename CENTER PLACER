@@ -1,0 +1,96 @@
+-- LocalScript (client-sided, works in Studio)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local targetPos = Vector3.new(24.18, 60.29, -8.13)
+local autoTeleportEnabled = false
+
+-- Helper function to spawn platform and teleport player
+local function spawnPlatformAndTeleport()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:WaitForChild("HumanoidRootPart")
+
+	-- Remove old platform if exists
+	local existing = workspace:FindFirstChild("SpawnedPlatform")
+	if existing then
+		existing:Destroy()
+	end
+
+	-- Create platform
+	local platform = Instance.new("Part")
+	platform.Name = "SpawnedPlatform"
+	platform.Anchored = true
+	platform.Size = Vector3.new(10,1,10)
+	platform.Position = targetPos
+	platform.Color = Color3.fromRGB(100,200,255)
+	platform.Parent = workspace
+
+	-- Teleport player on top
+	task.wait(0.1)
+	hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, platform.Size.Y/2 + 3, 0))
+end
+
+-- GUI creation
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PlatformTeleporterGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,90,0,55)
+frame.Position = UDim2.new(0.5,-100,0.5,-60) 
+frame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+frame.Parent = screenGui
+frame.Active = true
+frame.Draggable = true
+
+-- X Button (close GUI)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0,20,0,15) 
+closeBtn.Position = UDim2.new(1,-25,0,5)
+closeBtn.Text = "X"
+closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.Parent = frame
+closeBtn.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+
+-- On Button
+local onBtn = Instance.new("TextButton")
+onBtn.Size = UDim2.new(0,50,0,20)
+onBtn.Position = UDim2.new(0,10,0,5)
+onBtn.Text = "ON"
+onBtn.BackgroundColor3 = Color3.fromRGB(60,200,60)
+onBtn.TextColor3 = Color3.new(1,1,1)
+onBtn.Parent = frame
+onBtn.MouseButton1Click:Connect(function()
+	autoTeleportEnabled = true
+end)
+
+-- Off Button
+local offBtn = Instance.new("TextButton")
+offBtn.Size = UDim2.new(0,50,0,20)
+offBtn.Position = UDim2.new(0,10,0,30)
+offBtn.Text = "OFF"
+offBtn.BackgroundColor3 = Color3.fromRGB(200,60,60)
+offBtn.TextColor3 = Color3.new(1,1,1)
+offBtn.Parent = frame
+offBtn.MouseButton1Click:Connect(function()
+	autoTeleportEnabled = false
+end)
+
+-- Auto-teleport loop
+RunService.Heartbeat:Connect(function()
+	if autoTeleportEnabled then
+		local character = player.Character
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.Health <= 0 then
+			player.CharacterAdded:Wait()
+			task.wait(1)
+		end
+		spawnPlatformAndTeleport()
+		task.wait(1) -- check every second
+	end
+end)
