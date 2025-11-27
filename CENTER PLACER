@@ -3,7 +3,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
-local targetPos = Vector3.new(24.18, 42.29, -8.13) -- UPDATED COORDS
+local targetPos = Vector3.new(-2.58, 78.22, -19.71) -- UPDATED COORDS
 local autoTeleportEnabled = false
 
 -- Helper function to spawn platform and teleport player
