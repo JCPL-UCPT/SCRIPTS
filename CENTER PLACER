@@ -3,7 +3,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
-local targetPos = Vector3.new(24.18, 60.29, -8.13)
+local targetPos = Vector3.new(24.18, 42.29, -8.13) -- UPDATED COORDS
 local autoTeleportEnabled = false
 
 -- Helper function to spawn platform and teleport player
@@ -57,7 +57,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	screenGui:Destroy()
 end)
 
--- On Button
+-- ON Button
 local onBtn = Instance.new("TextButton")
 onBtn.Size = UDim2.new(0,50,0,20)
 onBtn.Position = UDim2.new(0,10,0,5)
@@ -69,7 +69,7 @@ onBtn.MouseButton1Click:Connect(function()
 	autoTeleportEnabled = true
 end)
 
--- Off Button
+-- OFF Button (now removes platform)
 local offBtn = Instance.new("TextButton")
 offBtn.Size = UDim2.new(0,50,0,20)
 offBtn.Position = UDim2.new(0,10,0,30)
@@ -79,6 +79,12 @@ offBtn.TextColor3 = Color3.new(1,1,1)
 offBtn.Parent = frame
 offBtn.MouseButton1Click:Connect(function()
 	autoTeleportEnabled = false
+
+	-- Remove platform on OFF press
+	local existing = workspace:FindFirstChild("SpawnedPlatform")
+	if existing then
+		existing:Destroy()
+	end
 end)
 
 -- Auto-teleport loop
@@ -94,3 +100,4 @@ RunService.Heartbeat:Connect(function()
 		task.wait(1) -- check every second
 	end
 end)
+
